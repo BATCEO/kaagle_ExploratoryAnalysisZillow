@@ -1,13 +1,10 @@
-# kaagle_ExploratoryAnalysisZillow
-kaagle上面的一个例子  有关于房价数据分析  原文是英文 自己翻译下来研究了一下  
- 
 ---
 title: "Exploratory Analysis Zillow"
 output:
   html_document:
-    fig_height: 4
-    fig_width: 7
-    theme: cosmo
+     fig_height: 4
+      fig_width: 7
+          theme: cosmo
 ---
 欢迎来到德莱联盟
 祝你在预测Zillow房价过程中有个好的结果
