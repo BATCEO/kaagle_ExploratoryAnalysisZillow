@@ -2,23 +2,25 @@
 title: "Exploratory Analysis Zillow"
 output:
   html_document:
-     fig_height: 4
-      fig_width: 7
-          theme: cosmo
+    fig_height: 4
+    fig_width: 7
+    theme: cosmo
 ---
-欢迎来到德莱联盟
-祝你在预测Zillow房价过程中有个好的结果
-目前价格为120万美元
-这是对竞争数据集的第一次探索性分析。
-我们提供了2016年3个县(洛杉矶，橙和文图拉，加州)的房地产项目清单。
-Zillow提供了一个“Zestimate”，这是一个估计的属性值。
-我们在这次竞赛中的任务是预测实际价格与价格的估计之间的差额(Zestimate)。                                                          所以，事实上我们在预测，Zillow的z估计值会很好，而且会很糟糕。
-到目前为止看来还不错。但是，我们不需要预测一个值，而是选择6个不同的时间点(从2016年10月到2017年12月)(见样本提交)
+欢迎来到德莱联盟  
+祝你在预测Zillow房价过程中有个好的结果  
+目前价格为120万美元  
+这是对竞争数据集的第一次探索性分析。  
+我们提供了2016年3个县(洛杉矶，橙和文图拉，加州)的房地产项目清单。  
+Zillow提供了一个“Zestimate”字段，这是一个估计的属性值。  
+我们在这次竞赛中的任务是预测实际价格与估计价格之间的差值(Zestimate)。  
+事实上我们在预测过程中，Zestimate字段在很好之后就会很坏。
+到目前为止看来还不错。但是，我们不需要预测一个单一值，而是选择6个不同的时间点来进行预测(从2016年10月到2017年12月)(见样本提交)  
 
-该数据集包含大约290万个属性，并被分成两个文件:
-  - properties_2016.csv (containing information about the properties themselves) #包含有关属性本身的信息。
-  - train_2016.csv (containing information about the transcations)  #包含关于销售的信息。
-让我们来看看这些数据集
+该数据集包含大约290万个属性，并被分成两个文件:  
+  - properties_2016.csv (containing information about the properties themselves) #包含有关属性本身的信息。  
+  - train_2016.csv (containing information about the transcations)  #包含关于销售的信息。  
+  
+让我们来看看这些数据集  
 
 ### 读取数据
 ```{r, message=FALSE, warning=FALSE, results='hide'}
@@ -46,7 +48,7 @@ options(tibble.width = Inf)
 我们先看看这些文件信息  
 ### 查看数据集  
 
-#### 属性  
+#### 属性数据集  
 每个属性共有58个特性。您可以滚动x轴以查看所有特性。  
 ```{r, result='asis', echo=FALSE}
 #datatable 是查看数据的一种方法 如果数据太大 可以用这种方法查看
@@ -55,7 +57,7 @@ datatable(head(properties,100), style="bootstrap", class="table-condensed", opti
 <img src="/img/1.png"></img>
 
 
-#### 交易
+#### 交易数据集
 
 ```{r, result='asis', echo=FALSE}
 datatable(head(transactions,100), style="bootstrap", class="table-condensed", options = list(dom = 'tp'))
@@ -63,7 +65,7 @@ datatable(head(transactions,100), style="bootstrap", class="table-condensed", op
 <img src="/img/2.png"></img>
 
 
-#### 样本
+#### 样本数据集
 
 ```{r, result='asis', echo=FALSE}
 datatable(head(sample_submission,10), style="bootstrap", class="table-condensed", options = list(dom = 'tp'))
@@ -74,7 +76,7 @@ datatable(head(sample_submission,10), style="bootstrap", class="table-condensed"
 特性名称并不是很好解释。例如，你怎么知道“finishedsquarefeet15”代表什么。我将在这里重命名它们。这将使处理数据集更容易(更一致，更短的名称):  
 
 ```{r warning=FALSE, message=FALSE}
-#字段重命名  将复杂的英文变为易读的
+#对属性的字段重命名  将复杂的英文变为易读的
 properties <- properties %>% rename(
   id_parcel = parcelid,
   build_year = yearbuilt,
@@ -127,6 +129,7 @@ properties <- properties %>% rename(
   aircon = airconditioningtypeid,
   architectural_style= architecturalstyletypeid
 )
+#对交易的字段重命名
 transactions <- transactions %>% rename(
   id_parcel = parcelid,
   date = transactiondate
@@ -140,31 +143,32 @@ properties <- properties %>%
          flag_tub = ifelse(flag_tub=="Y",1,0))
 ```
 
-### 查看重命名的数据集
+### 查看重命名之后的数据集
 
-#### 属性
-#可以滚动x轴查看所有特征  
+#### 属性数据集
+可以滚动x轴查看所有特征  
 ```{r, result='asis', echo=FALSE}
 properties <- properties %>% select(id_parcel, build_year, starts_with("area_"), starts_with("num_"), starts_with("flag_"), starts_with("region_"), everything())
 datatable(head(properties,100), style="bootstrap", class="table-condensed", options = list(dom = 'tp',scrollX = TRUE))
 ```
 <img src="/img/4.png"></img>
 
-#### 交易
+#### 交易数据集
 ```{r, result='asis', echo=FALSE}
 datatable(head(transactions,100), style="bootstrap", class="table-condensed", options = list(dom = 'tp'))
 ```
 <img src="/img/5.png"></img>
 
 ### 交易日期
-#乍一看，这有点令人困惑:交易有三个不同的时间段。所以我做了一个图表: ![](http://i.imgur.com/OibqfFb.png)   
+乍一看，这有点令人困惑:交易有三个不同的时间段。我做了一个图表: ![](http://i.imgur.com/OibqfFb.png)   
 
 #### 交易日期的分布
 如上面的图所示，有一些销售事件在训练集的10月25号之后，因为其余的都在测试集中(对于公共LB)。    
 就是10月25之前的作为训练集 用来训练模型  10月25之后的用来测试    
 
 ```{r}
-#tmp是将transactions的date进行了转换 但是根据转换结果来看 好像并没有什么变化  根据销售月份进行统计
+#tmp是将transactions的date进行了转换 但是根据转换结果来看 好像并没有什么变化  
+#根据销售月份进行统计
 tmp <- transactions %>% mutate(year_month = make_date(year=year(date),month=month(date)))
 #用临时变量tmp画图  %>% 管道    
 #group_by(year_month) 根据年月分组   
@@ -198,13 +202,13 @@ transactions %>%
 
 ### 对于结果的进一步分析
 事实上你可以看到两种结果  
-  - logerror: log(Zestimate) - log(Saleprice). So a positive logerror means Zestimate is overestimating the Saleprice, a negative logerror means that Zestimate is underestimating Saleprice. 
-  - absolute logerror: a small value means that log(Zestimate) is close to log(Saleprice). So, Zestimate predictions are close to Saleprice.
-一个正的logerror意味着Zestimate高估了Saleprice，一个负的logerror意味着Zestimate低估了Saleprice。  
-一个小的值意味着log(Zestimate)接近于log(Saleprice)。因此，Zestimate的预测接近于Saleprice。  
+  - logerror正负:一个正的logerror意味着Zestimate高估了实际价格，一个负的logerror意味着Zestimate低估了实际价格。   
+  - logerror大小:一个小的logerror意味着Zestimate接近于实际价格。所以，Zestimate的预测比较接近于实际价格。  
+  
+  
 
-logerror的关系表明，一个特性将与销售价格相关联。  
-任何带有绝对值logerror的特性的关联都表明该特性与一个更好的或更差的z估计值有关  
+logerror的关系表明，特性与销售的价格有关。      
+绝对值logerror的特性关系表明该特性与一个好的或坏的z估计值有关      
 
 ### 误差绝对值
 ```{r}
