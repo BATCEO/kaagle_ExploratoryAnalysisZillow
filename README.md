@@ -6,6 +6,8 @@ output:
     fig_width: 7
     theme: cosmo
 ---
+[阅读原文](https://www.kaggle.com/philippsp/exploratory-analysis-zillow)  
+  
 欢迎来到德莱联盟  
 祝你在预测Zillow房价过程中有个好的结果  
 目前价格为120万美元  
